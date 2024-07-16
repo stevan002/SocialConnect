@@ -1,18 +1,22 @@
 package com.example.SocialConnect.service;
 
 import com.example.SocialConnect.dto.user.AuthenticationResponse;
+import com.example.SocialConnect.dto.user.UserLoginRequest;
+import com.example.SocialConnect.dto.user.UserRegisterRequest;
+import com.example.SocialConnect.exception.BadRequestException;
 import com.example.SocialConnect.model.Role;
 import com.example.SocialConnect.model.User;
 import com.example.SocialConnect.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -23,55 +27,35 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Transactional
-    public AuthenticationResponse register(User request){
+    public void register(UserRegisterRequest request){
 
-        // Validate input
-        validateUserRequest(request);
-
-        // Check if username is already taken
         if (repository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username must be unique.");
+            throw new BadRequestException("username", "Username must be unique.");
         }
 
-        // Check if displayName is already taken
-        if (repository.existsByDisplayName(request.getDisplayName())) {
-            throw new IllegalArgumentException("Display name must be unique.");
-        }
-
-        // Create a new User object
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
-                .displayName(request.getDisplayName())
                 .role(Role.USER)
                 .description(request.getDescription())
                 .build();
 
-        // Save the user in the database
-        user = repository.save(user);
-
-        // Generate JWT token
-        String token = jwtService.generateToken(user);
-
-        return new AuthenticationResponse(token);
+        repository.save(user);
     }
 
     @Transactional
-    public AuthenticationResponse authenticate(User request){
+    public AuthenticationResponse authenticate(UserLoginRequest request){
 
-        // Find user by username
         User user = repository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Wrong username or password."));
+                .orElseThrow(() -> new BadRequestException("username", "Wrong username"));
 
-        // Check if passwords match
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Wrong username or password.");
+            throw new BadRequestException("password", "Wrong password.");
         }
 
-        // Perform authentication
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -79,9 +63,9 @@ public class AuthService {
                 )
         );
 
-        // Generate JWT token
+        user.setLastLogin(LocalDateTime.now());
+        repository.save(user);
         String token = jwtService.generateToken(user);
-
         return new AuthenticationResponse(token);
     }
 
@@ -90,18 +74,6 @@ public class AuthService {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             return authorizationHeader.substring(7);
         }
-        throw new IllegalArgumentException("Not found JWT token in header 'Authorization'.");
-    }
-
-    private void validateUserRequest(User request) {
-        if (request == null ||
-                request.getFirstName() == null ||
-                request.getLastName() == null ||
-                request.getUsername() == null ||
-                request.getPassword() == null ||
-                request.getEmail() == null ||
-                request.getDisplayName() == null) {
-            throw new IllegalArgumentException("Must input all data for user.");
-        }
+        throw new BadRequestException("token", "Not found JWT token in header 'Authorization'.");
     }
 }
