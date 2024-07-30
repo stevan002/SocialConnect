@@ -1,17 +1,13 @@
 package com.example.SocialConnect.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "group_post")
@@ -28,9 +24,16 @@ public class Group {
     @Column(nullable = false)
     private String name;
 
-    @Column(length = 1000)
+    @Column(nullable = false, length = 1000)
     private String description;
 
     @Column(nullable = false)
     private LocalDateTime creationDate;
+
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    private List<Post> posts;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
 }
