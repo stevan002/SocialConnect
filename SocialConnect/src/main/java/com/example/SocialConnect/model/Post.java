@@ -1,13 +1,9 @@
 package com.example.SocialConnect.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,12 +23,16 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Content cannot be blank")
+    @Size(max = 2000, message = "Content cannot exceed 2000 characters")
     @Column(nullable = false, length = 2000)
     private String content;
 
+    @NotNull(message = "Create date cannot be null")
     @Column(nullable = false)
     private LocalDateTime createDate;
 
+    @NotNull(message = "Posted by cannot be null")
     @ManyToOne
     @JoinColumn(name = "user_fk_id", nullable = false)
     private User postedBy;

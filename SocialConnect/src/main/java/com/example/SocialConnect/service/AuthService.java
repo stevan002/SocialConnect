@@ -34,7 +34,7 @@ public class AuthService {
         }
 
         if (repository.existsByEmail(request.getUsername())) {
-            throw new BadRequestException("email", "Email must be unique.");
+            throw new BadRequestException("username", "Username must be unique.");
         }
 
         User user = User.builder()
