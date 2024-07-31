@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,4 +37,9 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "post_fk_id", nullable = false)
     private Post post;
+
+    @NotNull(message = "Created by cannot be null")
+    @ManyToOne
+    @JoinColumn(name = "user_fk_id", nullable = false)
+    private User createdBy;
 }
