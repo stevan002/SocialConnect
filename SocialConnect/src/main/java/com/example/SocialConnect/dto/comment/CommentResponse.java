@@ -9,7 +9,11 @@ import java.time.LocalDateTime;
 @Setter
 public class CommentResponse {
 
+    private Long id;
     private String username;
     private String text;
     private LocalDateTime timestamp;
+    private long likeCount;
+    private long loveCount;
+    private long dislikeCount;
 }

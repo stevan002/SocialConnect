@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -19,6 +20,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/create-comment")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> createComment(@RequestBody @Valid CreateCommentRequest comment, Principal principal){
         String username = principal.getName();
         commentService.createComment(comment, username);
@@ -26,16 +28,19 @@ public class CommentController {
     }
 
     @GetMapping("/post/{postId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getCommentsForPost(@PathVariable Long postId){
         return ResponseEntity.ok(commentService.getCommentsForPost(postId));
     }
 
     @GetMapping("/{commentId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getComment(@PathVariable Long commentId){
         return ResponseEntity.ok(commentService.getComment(commentId));
     }
 
     @DeleteMapping("/delete-comment/{commentId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> deleteComment(@PathVariable Long commentId, Principal principal){
         String username = principal.getName();
         commentService.deleteComment(commentId, username);

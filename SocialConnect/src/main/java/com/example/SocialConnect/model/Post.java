@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -40,4 +41,7 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "group_fk_id")
     private Group group;
+
+    @OneToMany(mappedBy = "post")
+    private List<Reaction> reactions;
 }

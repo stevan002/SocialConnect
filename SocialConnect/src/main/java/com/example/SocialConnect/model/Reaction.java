@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,4 +44,9 @@ public class Reaction {
     @ManyToOne
     @JoinColumn(name = "comment_fk_id")
     private Comment comment;
+
+    @NotNull(message = "Created by cannot be null")
+    @ManyToOne
+    @JoinColumn(name = "user_fk_id", nullable = false)
+    private User createdBy;
 }

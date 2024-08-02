@@ -13,4 +13,7 @@ public class PostResponse {
     private String username;
     private String groupName;
     private LocalDateTime createDate;
+    private long likeCount;
+    private long loveCount;
+    private long dislikeCount;
 }

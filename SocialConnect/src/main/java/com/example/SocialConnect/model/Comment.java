@@ -1,13 +1,6 @@
 package com.example.SocialConnect.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
@@ -42,4 +36,7 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_fk_id", nullable = false)
     private User createdBy;
+
+    @OneToMany(mappedBy = "comment")
+    private List<Reaction> reactions;
 }

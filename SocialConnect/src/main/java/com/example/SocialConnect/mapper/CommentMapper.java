@@ -1,11 +1,12 @@
 package com.example.SocialConnect.mapper;
 
 import com.example.SocialConnect.dto.comment.CommentResponse;
-import com.example.SocialConnect.dto.post.PostResponse;
 import com.example.SocialConnect.model.Comment;
-import com.example.SocialConnect.model.Post;
+import com.example.SocialConnect.model.ReactionType;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -18,4 +19,17 @@ public interface CommentMapper {
     CommentResponse toCommentResponse(Comment comment);
 
     List<CommentResponse> toCommentResponseList(List<Comment> comments);
+
+    @AfterMapping
+    default void countReactions(Comment comment, @MappingTarget CommentResponse response) {
+        response.setLikeCount(comment.getReactions().stream()
+                .filter(reaction -> reaction.getType() == ReactionType.LIKE)
+                .count());
+        response.setLoveCount(comment.getReactions().stream()
+                .filter(reaction -> reaction.getType() == ReactionType.LOVE)
+                .count());
+        response.setDislikeCount(comment.getReactions().stream()
+                .filter(reaction -> reaction.getType() == ReactionType.DISLIKE)
+                .count());
+    }
 }
