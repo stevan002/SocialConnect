@@ -16,6 +16,9 @@ public interface CommentMapper {
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
 
     @Mapping(source = "createdBy.username", target = "username")
+    @Mapping(target = "likeCount", ignore = true)
+    @Mapping(target = "loveCount", ignore = true)
+    @Mapping(target = "dislikeCount", ignore = true)
     CommentResponse toCommentResponse(Comment comment);
 
     List<CommentResponse> toCommentResponseList(List<Comment> comments);

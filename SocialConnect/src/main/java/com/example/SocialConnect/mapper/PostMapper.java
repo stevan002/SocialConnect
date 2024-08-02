@@ -17,6 +17,9 @@ public interface PostMapper {
 
     @Mapping(source = "postedBy.username", target = "username")
     @Mapping(source = "group.name", target = "groupName")
+    @Mapping(target = "likeCount", ignore = true)
+    @Mapping(target = "loveCount", ignore = true)
+    @Mapping(target = "dislikeCount", ignore = true)
     PostResponse toPostResponse(Post post);
 
     List<PostResponse> toPostResponseList(List<Post> posts);

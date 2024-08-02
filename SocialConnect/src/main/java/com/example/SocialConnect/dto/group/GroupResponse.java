@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class GroupResponse {
     private String id;
+    private String username;
     private String name;
     private String description;
     private LocalDateTime creationDate;
