@@ -21,7 +21,7 @@ export class LoginComponent {
     this.userService.login(this.loginRequest).subscribe(
       response => {
         this.responseMessage = 'Login successful';
-        this.router.navigate(['/home']);
+        this.router.navigate(['/groups']);
       },
       error => {
         this.responseMessage = error.error.message || 'Login failed';

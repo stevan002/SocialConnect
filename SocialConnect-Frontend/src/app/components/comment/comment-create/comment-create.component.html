@@ -1,0 +1,8 @@
+<div class="create-comment-container">
+    <form [formGroup]="commentForm" (ngSubmit)="submitComment()">
+        <div class="form-group">
+            <textarea formControlName="text" placeholder="Write a comment..." class="comment-textarea"></textarea>
+        </div>
+        <button type="submit" class="submit-button" [disabled]="commentForm.invalid">Submit Comment</button>
+    </form>
+</div>

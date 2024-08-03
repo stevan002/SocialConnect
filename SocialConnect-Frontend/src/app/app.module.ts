@@ -6,32 +6,50 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
-import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastNoAnimation, ToastrModule } from 'ngx-toastr';
+import { GroupListComponent } from './components/group/group-list/group-list.component';
+import { GroupCreateComponent } from './components/group/group-create/group-create.component';
+import { AuthInterceptor } from './services/auth.interceptor';
+import { PostListComponent } from './components/post/post-list/post-list.component';
+import { PostCreateComponent } from './components/post/post-create/post-create.component';
+import { CommentCreateComponent } from './components/comment/comment-create/comment-create.component';
+import { CommentListComponent } from './components/comment/comment-list/comment-list.component';
+import { ReactionCreateComponent } from './components/reaction/reaction-create/reaction-create.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    HomeComponent
+    HomeComponent,
+    GroupListComponent,
+    GroupCreateComponent,
+    PostListComponent,
+    PostCreateComponent,
+    CommentCreateComponent,
+    CommentListComponent,
+    ReactionCreateComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    ToastrModule.forRoot({
-      positionClass: 'toast-top-right',
-      closeButton: true,
-      progressBar: true,
-    }),
+    ToastrModule.forRoot(),
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    ReactiveFormsModule
   ],
   providers: [
-    provideClientHydration()
+    provideClientHydration(),
+    provideHttpClient(withFetch()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

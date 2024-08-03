@@ -1,0 +1,22 @@
+<div class="comments-container">
+    <h3>Comments</h3>
+    <ul class="comments-list">
+        <li *ngFor="let comment of comments" class="comment-item">
+            <div class="comment-info">
+                <strong>{{ comment.username }}</strong>
+                <p>{{ comment.text }}</p>
+                <span class="creation-date">{{ comment.timestamp | date }}</span>
+                <p class="reactions">
+                    <strong>Likes:</strong> {{ comment.likeCount }}
+                    <strong>Loves:</strong> {{ comment.loveCount }}
+                    <strong>Dislikes:</strong> {{ comment.dislikeCount }}
+                </p>
+                <app-reaction-create [commentId]="comment.id" (reactionCreated)="onReactionCreated()"></app-reaction-create>
+                <button *ngIf="canDeleteComment(comment)" (click)="deleteComment(comment.id)" class="delete-comment-button">Delete</button>
+            </div>
+        </li>
+    </ul>
+    <div *ngIf="comments.length === 0">
+        <p>No comments yet.</p>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+<div class="groups-container">
+    <h2>Groups</h2>
+    <ul class="groups-list">
+      <li *ngFor="let group of groups" class="group-item">
+        <div class="group-info">
+          <h3>{{ group.name }}</h3>
+          <p>{{ group.description }}</p>
+          <span class="creation-date">Created by {{ group.username }} on {{ group.creationDate | date }} </span>
+        </div>
+        <button *ngIf="canDeleteGroup(group)" (click)="deleteGroup(group.id)" class="delete-button">Delete</button>
+      </li>
+    </ul>
+  </div>
+  

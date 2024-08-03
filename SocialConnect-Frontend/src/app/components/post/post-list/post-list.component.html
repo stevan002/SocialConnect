@@ -1,0 +1,22 @@
+<div class="posts-container">
+    <h2>Posts</h2>
+    <ul class="posts-list">
+        <li *ngFor="let post of posts" class="post-item">
+            <div class="post-info">
+                <h3>{{ post.username }}</h3>
+                <p>{{ post.content }}</p>
+                <span class="group-name" *ngIf="post.groupName"><strong>Group:</strong> {{ post.groupName }}</span>
+                <span class="creation-date"><strong>Date:</strong> {{ post.createDate | date }}</span>
+                <p class="reactions">
+                    <strong>Likes:</strong> {{ post.likeCount }}
+                    <strong>Loves:</strong> {{ post.loveCount }}
+                    <strong>Dislikes:</strong> {{ post.dislikeCount }}
+                </p>
+            </div>
+            <button *ngIf="canDeletePost(post)" (click)="deletePost(post.id)" class="delete-button">Delete Post</button>
+            <app-reaction-create [postId]="post.id" (reactionCreated)="onReactionCreated()"></app-reaction-create>
+            <app-comment-create [postId]="post.id" (commentCreated)="onCommentCreated(post)"></app-comment-create>
+            <app-comment-list [comments]="post.comments" [postId]="post.id"></app-comment-list>
+        </li>
+    </ul>
+</div>

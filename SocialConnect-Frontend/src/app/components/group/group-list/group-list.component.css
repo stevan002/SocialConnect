@@ -1,0 +1,54 @@
+/* group-list.component.css */
+.groups-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+}
+
+.groups-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.group-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.group-info {
+    flex: 1;
+}
+
+.group-info h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.group-info p {
+    margin: 5px 0;
+}
+
+.creation-date {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.delete-button {
+    background-color: #e53935;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.delete-button:hover {
+    background-color: #c62828;
+}
