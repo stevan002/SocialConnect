@@ -10,7 +10,7 @@ import lombok.Setter;
 public class CreatePostRequest {
 
     @NotBlank(message = "Content is required")
-    @Size(min = 4, max = 20, message = "Post content must have minimum 4 characters")
+    @Size(min = 4, message = "Post content must have minimum 4 characters")
     private String content;
 
     private Long groupId;
