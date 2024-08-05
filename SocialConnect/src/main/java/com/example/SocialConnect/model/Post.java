@@ -44,4 +44,7 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     private List<Reaction> reactions;
+
+    @Column(name = "content_filename", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT ''")
+    private String contentFilename;
 }

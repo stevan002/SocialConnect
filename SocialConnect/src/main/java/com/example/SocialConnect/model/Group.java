@@ -45,4 +45,7 @@ public class Group {
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+
+    @Column(name = "description_filename", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT ''")
+    private String descriptionFilename;
 }
