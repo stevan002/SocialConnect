@@ -1,7 +1,7 @@
 package com.example.SocialConnect.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import com.example.SocialConnect.indexmodel.GroupIndex;
+import com.example.SocialConnect.indexmodel.PostIndex;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -19,50 +19,50 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class GroupSearchService {
+public class PostSearchService {
 
     private final ElasticsearchOperations elasticsearchRestTemplate;
 
-    public List<Map<String, Object>> searchGroups(String name, String description, String operator) {
-        if (name == null && description == null) {
+    public List<Map<String, Object>> searchPosts(String title, String fullContent, String operator) {
+        if (title == null && fullContent == null) {
             return Collections.emptyList();
         }
 
         //Highlighter
         ArrayList<HighlightField> fields = new ArrayList<>();
-        fields.add(new HighlightField("name"));
-        fields.add(new HighlightField("description"));
-        HighlightQuery highlightQuery = new HighlightQuery(new Highlight(fields), GroupIndex.class);
+        fields.add(new HighlightField("title"));
+        fields.add(new HighlightField("full_content"));
+        HighlightQuery highlightQuery = new HighlightQuery(new Highlight(fields), PostIndex.class);
 
         NativeQuery searchQuery = new NativeQueryBuilder()
                 .withQuery(BoolQuery.of(q -> q.must(mb -> mb.bool(b -> {
-
-                    //Operator
+                    // Operator
                     boolean useAnd = "AND".equalsIgnoreCase(operator);
 
-                    if (name != null) {
-                        //FuzzyQuery
-                        if (useAnd) b.must(sb -> sb.match(m -> m.field("name")
-                                .fuzziness(Fuzziness.ONE.asString()).query(name)));
-                        else b.should(sb -> sb.match(m -> m.field("name")
-                                .fuzziness(Fuzziness.ONE.asString()).query(name)));
+                    if (title != null) {
+
+                        // FuzzyQuery
+                        if (useAnd) b.must(sb -> sb.match(m -> m.field("title")
+                                .fuzziness(Fuzziness.ONE.asString()).query(title)));
+                        else b.should(sb -> sb.match(m -> m.field("title")
+                                .fuzziness(Fuzziness.ONE.asString()).query(title)));
 
                         //PhrazeQuery
-                        b.should(sb -> sb.matchPhrase(p -> p.field("name")
-                                .slop(1).query(name)));
+                        b.should(sb -> sb.matchPhrase(p -> p.field("title")
+                                .slop(1).query(title)));
                     }
 
-                    if (description != null) {
+                    if (fullContent != null) {
 
                         //FuzzyQuery
-                        if (useAnd) b.must(sb -> sb.match(m -> m.field("description")
-                                .fuzziness(Fuzziness.ONE.asString()).query(description)));
-                        else b.should(sb -> sb.match(m -> m.field("description")
-                                .fuzziness(Fuzziness.ONE.asString()).query(description)));
+                        if (useAnd) b.must(sb -> sb.match(m -> m.field("full_content")
+                                .fuzziness(Fuzziness.ONE.asString()).query(fullContent)));
+                        else b.should(sb -> sb.match(m -> m.field("full_content")
+                                .fuzziness(Fuzziness.ONE.asString()).query(fullContent)));
 
                         //PhrazeQuery
-                        b.should(sb -> sb.matchPhrase(p -> p.field("description")
-                                .slop(1).query(description)));
+                        b.should(sb -> sb.matchPhrase(p -> p.field("full_content")
+                                .slop(1).query(fullContent)));
                     }
 
                     return b;
@@ -70,11 +70,11 @@ public class GroupSearchService {
                 .withHighlightQuery(highlightQuery)
                 .build();
 
-        SearchHits<GroupIndex> searchHits = elasticsearchRestTemplate.search(searchQuery, GroupIndex.class,
-                IndexCoordinates.of("group_index"));
+        SearchHits<PostIndex> searchHits = elasticsearchRestTemplate.search(searchQuery, PostIndex.class,
+                IndexCoordinates.of("post_index"));
 
         List<Map<String, Object>> results = new ArrayList<>();
-        for (SearchHit<GroupIndex> hit : searchHits) {
+        for (SearchHit<PostIndex> hit : searchHits) {
             Map<String, Object> result = new HashMap<>();
             result.put("source", hit.getContent());
             result.put("highlights", hit.getHighlightFields());
