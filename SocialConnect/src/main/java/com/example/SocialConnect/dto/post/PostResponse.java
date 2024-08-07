@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class PostResponse {
     private Long id;
+    private String title;
     private String content;
     private String username;
     private String groupName;

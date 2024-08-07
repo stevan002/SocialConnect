@@ -1,6 +1,7 @@
 package com.example.SocialConnect.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.example.SocialConnect.indexmodel.PostIndex;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.common.unit.Fuzziness;
@@ -23,50 +24,23 @@ public class PostSearchService {
 
     private final ElasticsearchOperations elasticsearchRestTemplate;
 
-    public List<Map<String, Object>> searchPosts(String title, String fullContent, String operator) {
-        if (title == null && fullContent == null) {
+    public List<Map<String, Object>> searchPosts(String title, String fullContent, String operator, String fileContent) {
+        if (title == null && fullContent == null && fileContent == null) {
             return Collections.emptyList();
         }
 
-        //Highlighter
-        ArrayList<HighlightField> fields = new ArrayList<>();
-        fields.add(new HighlightField("title"));
-        fields.add(new HighlightField("full_content"));
+        // Dynamic highlighting
+        List<HighlightField> fields = Arrays.asList(
+                new HighlightField("title"),
+                new HighlightField("full_content"),
+                new HighlightField("file_content")
+        );
         HighlightQuery highlightQuery = new HighlightQuery(new Highlight(fields), PostIndex.class);
 
+        Query boolQuery = buildBoolQuery(title, fullContent, fileContent, operator);
+
         NativeQuery searchQuery = new NativeQueryBuilder()
-                .withQuery(BoolQuery.of(q -> q.must(mb -> mb.bool(b -> {
-                    // Operator
-                    boolean useAnd = "AND".equalsIgnoreCase(operator);
-
-                    if (title != null) {
-
-                        // FuzzyQuery
-                        if (useAnd) b.must(sb -> sb.match(m -> m.field("title")
-                                .fuzziness(Fuzziness.ONE.asString()).query(title)));
-                        else b.should(sb -> sb.match(m -> m.field("title")
-                                .fuzziness(Fuzziness.ONE.asString()).query(title)));
-
-                        //PhrazeQuery
-                        b.should(sb -> sb.matchPhrase(p -> p.field("title")
-                                .slop(1).query(title)));
-                    }
-
-                    if (fullContent != null) {
-
-                        //FuzzyQuery
-                        if (useAnd) b.must(sb -> sb.match(m -> m.field("full_content")
-                                .fuzziness(Fuzziness.ONE.asString()).query(fullContent)));
-                        else b.should(sb -> sb.match(m -> m.field("full_content")
-                                .fuzziness(Fuzziness.ONE.asString()).query(fullContent)));
-
-                        //PhrazeQuery
-                        b.should(sb -> sb.matchPhrase(p -> p.field("full_content")
-                                .slop(1).query(fullContent)));
-                    }
-
-                    return b;
-                })))._toQuery())
+                .withQuery(boolQuery)
                 .withHighlightQuery(highlightQuery)
                 .build();
 
@@ -82,5 +56,32 @@ public class PostSearchService {
         }
 
         return results;
+    }
+
+    private Query buildBoolQuery(String title, String fullContent, String fileContent, String operator) {
+        return Query.of(q -> q.bool(b -> {
+            boolean useAnd = "AND".equalsIgnoreCase(operator);
+
+            addMatchQueries(b, "title", title, useAnd);
+            addMatchQueries(b, "full_content", fullContent, useAnd);
+            addMatchQueries(b, "file_content", fileContent, useAnd);
+
+            return b;
+        }));
+    }
+
+    private void addMatchQueries(BoolQuery.Builder b, String field, String value, boolean useAnd) {
+        if (value != null) {
+            if (useAnd) {
+                b.must(mb -> mb.match(m -> m.field(field)
+                        .fuzziness(Fuzziness.ONE.asString()).query(value)));
+            } else {
+                b.should(sb -> sb.match(m -> m.field(field)
+                        .fuzziness(Fuzziness.ONE.asString()).query(value)));
+            }
+
+            b.should(sb -> sb.matchPhrase(mp -> mp.field(field)
+                    .slop(1).query(value)));
+        }
     }
 }

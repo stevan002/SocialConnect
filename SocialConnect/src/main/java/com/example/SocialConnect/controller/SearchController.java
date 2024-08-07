@@ -22,15 +22,17 @@ public class SearchController {
     @GetMapping("/groups")
     public List<Map<String, Object>> searchGroups(@RequestParam(required = false) String name,
                                                   @RequestParam(required = false) String description,
+                                                  @RequestParam(required = false) String fileContent,
                                                   @RequestParam(required = false, defaultValue = "OR") String operator) {
-        return groupSearchService.searchGroups(name, description, operator);
+        return groupSearchService.searchGroups(name, description, operator, fileContent);
     }
 
     @GetMapping("/posts")
     public List<Map<String, Object>> searchPosts(@RequestParam(required = false) String title,
                                                   @RequestParam(required = false) String content,
+                                                 @RequestParam(required = false) String fileContent,
                                                   @RequestParam(required = false, defaultValue = "OR") String operator) {
-        return postSearchService.searchPosts(title, content, operator);
+        return postSearchService.searchPosts(title, content, operator, fileContent);
     }
 
 }

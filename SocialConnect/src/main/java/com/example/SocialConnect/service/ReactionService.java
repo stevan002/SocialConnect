@@ -3,6 +3,8 @@ package com.example.SocialConnect.service;
 import com.example.SocialConnect.dto.http.ApiResponse;
 import com.example.SocialConnect.dto.reaction.CreateReactionRequest;
 import com.example.SocialConnect.exception.BadRequestException;
+import com.example.SocialConnect.indexmodel.PostIndex;
+import com.example.SocialConnect.indexrepository.PostIndexRepository;
 import com.example.SocialConnect.model.*;
 import com.example.SocialConnect.repository.CommentRepository;
 import com.example.SocialConnect.repository.PostRepository;
@@ -21,6 +23,7 @@ public class ReactionService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final PostIndexRepository postIndexRepository;
 
     public ApiResponse createReaction(CreateReactionRequest reactionRequest, String username) {
 
@@ -35,8 +38,9 @@ public class ReactionService {
         }
 
         Reaction existingReaction = null;
+        Post post = null;
         if (reactionRequest.getPostId() != null && reactionRequest.getCommentId() == null) {
-            Post post = postRepository.findById(reactionRequest.getPostId())
+            post = postRepository.findById(reactionRequest.getPostId())
                     .orElseThrow(() -> new BadRequestException("post", "Not found post with given id"));
             existingReaction = reactionRepository.findByPostAndCreatedBy(post, user);
         } else if (reactionRequest.getCommentId() != null && reactionRequest.getPostId() == null) {
@@ -50,11 +54,20 @@ public class ReactionService {
         String message;
         if (existingReaction != null) {
             if (existingReaction.getType() == reactionType) {
+                if (reactionType == ReactionType.LIKE && post != null) {
+                    updatePostIndexLikes(post.getId(), -1);
+                }
                 reactionRepository.delete(existingReaction);
                 message = "Successfully deleted reaction";
             } else {
+                if (existingReaction.getType() == ReactionType.LIKE && post != null) {
+                    updatePostIndexLikes(post.getId(), -1);
+                }
                 existingReaction.setType(reactionType);
                 reactionRepository.save(existingReaction);
+                if (reactionType == ReactionType.LIKE && post != null) {
+                    updatePostIndexLikes(post.getId(), 1);
+                }
                 message = "Successfully updated reaction";
             }
         } else {
@@ -64,7 +77,7 @@ public class ReactionService {
                     .timestamp(LocalDateTime.now());
 
             if (reactionRequest.getPostId() != null) {
-                Post post = postRepository.findById(reactionRequest.getPostId())
+                post = postRepository.findById(reactionRequest.getPostId())
                         .orElseThrow(() -> new BadRequestException("post", "Not found post with given id"));
                 reactionBuilder.post(post);
             } else {
@@ -75,9 +88,21 @@ public class ReactionService {
 
             Reaction reaction = reactionBuilder.build();
             reactionRepository.save(reaction);
+            if (reactionType == ReactionType.LIKE && post != null) {
+                updatePostIndexLikes(post.getId(), 1);
+            }
             message = "Successfully created reaction";
         }
 
         return new ApiResponse(true, message);
+    }
+
+    private void updatePostIndexLikes(Long postId, int delta) {
+        PostIndex postIndex = postIndexRepository.findByDatabaseId(postId)
+                .orElseThrow(() -> new BadRequestException("postIndex", "PostIndex with given database ID not found"));
+
+        long currentLikes = postIndex.getNumberOfLikes();
+        postIndex.setNumberOfLikes(currentLikes + delta);
+        postIndexRepository.save(postIndex);
     }
 }
