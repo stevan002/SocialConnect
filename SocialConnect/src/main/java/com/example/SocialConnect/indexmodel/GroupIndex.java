@@ -1,9 +1,6 @@
 package com.example.SocialConnect.indexmodel;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -15,6 +12,7 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(indexName = "group_index")
+@Builder
 public class GroupIndex {
 
     @Id
@@ -31,9 +29,6 @@ public class GroupIndex {
 
     @Field(type = FieldType.Long, store = true, name = "number_of_posts")
     private Long numberOfPosts;
-
-    @Field(type = FieldType.Text, store = true, name = "rules", analyzer = "serbian", searchAnalyzer = "serbian")
-    private String rules;
 
     @Field(type = FieldType.Double, store = true, name = "average_likes")
     private Double averageLikes;

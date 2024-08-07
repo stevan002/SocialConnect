@@ -9,6 +9,10 @@ import lombok.Setter;
 @Setter
 public class CreatePostRequest {
 
+    @NotBlank(message = "Title is required")
+    @Size(min = 4, message = "Post title must have minimum 4 characters")
+    private String title;
+
     @NotBlank(message = "Content is required")
     @Size(min = 4, message = "Post content must have minimum 4 characters")
     private String content;

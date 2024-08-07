@@ -10,16 +10,16 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @EnableElasticsearchRepositories(basePackages = "com.example.SocialConnect.indexrepository")
 public class ElasticsearchConfiguration extends org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration {
 
-    @Value("${elasticsearch.host}")
+    @Value("${spring.elasticsearch.host}")
     private String host;
 
-    @Value("${elasticsearch.port}")
+    @Value("${spring.elasticsearch.port}")
     private int port;
 
-    @Value("${elasticsearch.username}")
+    @Value("${spring.elasticsearch.username}")
     private String userName;
 
-    @Value("${elasticsearch.password}")
+    @Value("${spring.elasticsearch.password}")
     private String password;
 
     @NonNull

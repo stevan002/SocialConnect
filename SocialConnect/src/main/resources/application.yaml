@@ -11,21 +11,27 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
         show_sql: true
 
-elasticsearch:
-  host: ${ES_HOST:localhost}
-  port: ${ES_PORT:9200}
-  username: ${ES_USERNAME:}
-  password: ${ES_PASSWORD:}
+  elasticsearch:
+    host: ${ES_HOST:localhost}
+    port: ${ES_PORT:9200}
+    username: ${ES_USERNAME:}
+    password: ${ES_PASSWORD:}
 
-minio:
-  url: http://${MINIO_HOST:localhost}:9000
-  bucket: ${MINIO_BUCKET:sn-file-items}
-  access-key: ${MINIO_ACCESS_KEY:ROOTUSER}
-  secret-key: ${MINIO_SECRET_KEY:CHANGEME123}
+  minio:
+    url: http://${MINIO_HOST:localhost}:9000
+    bucket: ${MINIO_BUCKET:sn-file-items}
+    access-key: ${MINIO_ACCESS_KEY:ROOTUSER}
+    secret-key: ${MINIO_SECRET_KEY:CHANGEME123}
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2MB
+      max-request-size: 2MB

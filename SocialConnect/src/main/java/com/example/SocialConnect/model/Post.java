@@ -24,6 +24,11 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title cannot be blank")
+    @Size(max = 100, message = "Title cannot exceed 100 characters")
+    @Column(nullable = false, length = 100)
+    private String title;
+
     @NotBlank(message = "Content cannot be blank")
     @Size(max = 2000, message = "Content cannot exceed 2000 characters")
     @Column(nullable = false, length = 2000)
@@ -44,6 +49,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     private List<Reaction> reactions;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments;
 
     @Column(name = "content_filename", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT ''")
     private String contentFilename;

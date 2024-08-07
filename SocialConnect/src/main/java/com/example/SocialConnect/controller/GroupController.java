@@ -2,15 +2,23 @@ package com.example.SocialConnect.controller;
 
 import com.example.SocialConnect.dto.group.CreateGroupRequest;
 import com.example.SocialConnect.dto.http.ApiResponse;
-import com.example.SocialConnect.repository.GroupRepository;
+import com.example.SocialConnect.service.FileServiceMinio;
 import com.example.SocialConnect.service.GroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.Principal;
 
 @RestController
@@ -19,12 +27,16 @@ import java.security.Principal;
 public class GroupController {
 
     private final GroupService groupService;
+    private final FileServiceMinio fileServiceMinio;
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/create-group")
-    public ResponseEntity<?> createGroup(@RequestBody @Valid CreateGroupRequest groupRequest, Principal principal){
+    @PostMapping(value = "/create-group", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createGroup(@RequestPart("group") @Valid CreateGroupRequest groupRequest,
+                                         @RequestPart("file") MultipartFile file,
+                                         Principal principal){
+        System.out.println("Received request to create group with file: " + file.getOriginalFilename());
         String username = principal.getName();
-        groupService.createGroup(groupRequest, username);
+        groupService.createGroup(groupRequest, username, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(true, "Successfully created group"));
     }
 
@@ -46,5 +58,15 @@ public class GroupController {
         String username = principal.getName();
         groupService.deleteGroup(groupId, username);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Successfully deleted group"));
+    }
+
+    @GetMapping("/file/{filename}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String filename) throws IOException {
+        var minioResponse = fileServiceMinio.loadAsResource(filename);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, minioResponse.headers().get("Content-Disposition"))
+                .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(Path.of(filename)))
+                .body(new InputStreamResource(minioResponse));
     }
 }
