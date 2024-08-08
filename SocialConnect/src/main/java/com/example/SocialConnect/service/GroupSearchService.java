@@ -24,8 +24,8 @@ public class GroupSearchService {
 
     private final ElasticsearchOperations elasticsearchRestTemplate;
 
-    public List<Map<String, Object>> searchGroups(String name, String description, String operator, String fileContent) {
-        if (name == null && description == null && fileContent == null) {
+    public List<Map<String, Object>> searchGroups(String name, String description, String operator, String fileContent, Long minNumberOfPosts, Long maxNumberOfPosts) {
+        if (name == null && description == null && fileContent == null && minNumberOfPosts == null && maxNumberOfPosts == null) {
             return Collections.emptyList();
         }
 
@@ -37,7 +37,7 @@ public class GroupSearchService {
         );
         HighlightQuery highlightQuery = new HighlightQuery(new Highlight(fields), GroupIndex.class);
 
-        Query boolQuery = buildBoolQuery(name, description, fileContent, operator);
+        Query boolQuery = buildBoolQuery(name, description, fileContent, operator, minNumberOfPosts, maxNumberOfPosts);
 
         NativeQuery searchQuery = new NativeQueryBuilder()
                 .withQuery(boolQuery)
@@ -58,13 +58,14 @@ public class GroupSearchService {
         return results;
     }
 
-    private Query buildBoolQuery(String name, String description, String fileContent, String operator) {
+    private Query buildBoolQuery(String name, String description, String fileContent, String operator, Long minNumberOfPosts, Long maxNumberOfPosts) {
         return Query.of(q -> q.bool(b -> {
             boolean useAnd = "AND".equalsIgnoreCase(operator);
 
             addMatchQueries(b, "name", name, useAnd);
             addMatchQueries(b, "description", description, useAnd);
             addMatchQueries(b, "file_content", fileContent, useAnd);
+            addRangeQuery(b, minNumberOfPosts, maxNumberOfPosts, useAnd);
 
             return b;
         }));
@@ -82,6 +83,19 @@ public class GroupSearchService {
 
             b.should(sb -> sb.matchPhrase(mp -> mp.field(field)
                     .slop(1).query(value)));
+        }
+    }
+
+    private void addRangeQuery(BoolQuery.Builder b, Long minNumberOfPosts, Long maxNumberOfPosts, boolean useAnd) {
+        if (minNumberOfPosts != null && maxNumberOfPosts != null) {
+            String min = minNumberOfPosts.toString();
+            String max = maxNumberOfPosts.toString();
+
+            if (useAnd) {
+                b.must(sb -> sb.range(r -> r.field("number_of_posts").from(min).to(max)));
+            } else {
+                b.should(sb -> sb.range(r -> r.field("number_of_posts").from(min).to(max)));
+            }
         }
     }
 }

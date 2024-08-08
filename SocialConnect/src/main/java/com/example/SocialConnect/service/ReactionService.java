@@ -39,13 +39,16 @@ public class ReactionService {
 
         Reaction existingReaction = null;
         Post post = null;
+        Comment comment = null;
+
         if (reactionRequest.getPostId() != null && reactionRequest.getCommentId() == null) {
             post = postRepository.findById(reactionRequest.getPostId())
                     .orElseThrow(() -> new BadRequestException("post", "Not found post with given id"));
             existingReaction = reactionRepository.findByPostAndCreatedBy(post, user);
         } else if (reactionRequest.getCommentId() != null && reactionRequest.getPostId() == null) {
-            Comment comment = commentRepository.findById(reactionRequest.getCommentId())
+            comment = commentRepository.findById(reactionRequest.getCommentId())
                     .orElseThrow(() -> new BadRequestException("comment", "Not found comment with given id"));
+            post = comment.getPost();
             existingReaction = reactionRepository.findByCommentAndCreatedBy(comment, user);
         } else {
             throw new BadRequestException("reaction", "Either postId or commentId must be provided, but not both");
@@ -54,18 +57,18 @@ public class ReactionService {
         String message;
         if (existingReaction != null) {
             if (existingReaction.getType() == reactionType) {
-                if (reactionType == ReactionType.LIKE && post != null) {
+                if (reactionType == ReactionType.LIKE) {
                     updatePostIndexLikes(post.getId(), -1);
                 }
                 reactionRepository.delete(existingReaction);
                 message = "Successfully deleted reaction";
             } else {
-                if (existingReaction.getType() == ReactionType.LIKE && post != null) {
+                if (existingReaction.getType() == ReactionType.LIKE) {
                     updatePostIndexLikes(post.getId(), -1);
                 }
                 existingReaction.setType(reactionType);
                 reactionRepository.save(existingReaction);
-                if (reactionType == ReactionType.LIKE && post != null) {
+                if (reactionType == ReactionType.LIKE) {
                     updatePostIndexLikes(post.getId(), 1);
                 }
                 message = "Successfully updated reaction";
@@ -81,14 +84,14 @@ public class ReactionService {
                         .orElseThrow(() -> new BadRequestException("post", "Not found post with given id"));
                 reactionBuilder.post(post);
             } else {
-                Comment comment = commentRepository.findById(reactionRequest.getCommentId())
+                comment = commentRepository.findById(reactionRequest.getCommentId())
                         .orElseThrow(() -> new BadRequestException("comment", "Not found comment with given id"));
                 reactionBuilder.comment(comment);
             }
 
             Reaction reaction = reactionBuilder.build();
             reactionRepository.save(reaction);
-            if (reactionType == ReactionType.LIKE && post != null) {
+            if (reactionType == ReactionType.LIKE) {
                 updatePostIndexLikes(post.getId(), 1);
             }
             message = "Successfully created reaction";

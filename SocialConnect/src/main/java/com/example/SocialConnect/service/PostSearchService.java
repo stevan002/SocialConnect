@@ -24,8 +24,8 @@ public class PostSearchService {
 
     private final ElasticsearchOperations elasticsearchRestTemplate;
 
-    public List<Map<String, Object>> searchPosts(String title, String fullContent, String operator, String fileContent) {
-        if (title == null && fullContent == null && fileContent == null) {
+    public List<Map<String, Object>> searchPosts(String title, String fullContent, String operator, String fileContent, Long minLikes, Long maxLikes) {
+        if (title == null && fullContent == null && fileContent == null && minLikes == null && maxLikes == null) {
             return Collections.emptyList();
         }
 
@@ -37,7 +37,7 @@ public class PostSearchService {
         );
         HighlightQuery highlightQuery = new HighlightQuery(new Highlight(fields), PostIndex.class);
 
-        Query boolQuery = buildBoolQuery(title, fullContent, fileContent, operator);
+        Query boolQuery = buildBoolQuery(title, fullContent, fileContent, operator, minLikes, maxLikes);
 
         NativeQuery searchQuery = new NativeQueryBuilder()
                 .withQuery(boolQuery)
@@ -58,13 +58,14 @@ public class PostSearchService {
         return results;
     }
 
-    private Query buildBoolQuery(String title, String fullContent, String fileContent, String operator) {
+    private Query buildBoolQuery(String title, String fullContent, String fileContent, String operator, Long minNumberOfPosts, Long maxNumberOfPosts) {
         return Query.of(q -> q.bool(b -> {
             boolean useAnd = "AND".equalsIgnoreCase(operator);
 
             addMatchQueries(b, "title", title, useAnd);
             addMatchQueries(b, "full_content", fullContent, useAnd);
             addMatchQueries(b, "file_content", fileContent, useAnd);
+            addRangeQuery(b, minNumberOfPosts, maxNumberOfPosts, useAnd);
 
             return b;
         }));
@@ -82,6 +83,19 @@ public class PostSearchService {
 
             b.should(sb -> sb.matchPhrase(mp -> mp.field(field)
                     .slop(1).query(value)));
+        }
+    }
+
+    private void addRangeQuery(BoolQuery.Builder b, Long minNumberOfLikes, Long maxNumberOfLikes, boolean useAnd) {
+        if (minNumberOfLikes != null && maxNumberOfLikes != null) {
+            String min = minNumberOfLikes.toString();
+            String max = maxNumberOfLikes.toString();
+
+            if (useAnd) {
+                b.must(sb -> sb.range(r -> r.field("number_of_likes").from(min).to(max)));
+            } else {
+                b.should(sb -> sb.range(r -> r.field("number_of_likes").from(min).to(max)));
+            }
         }
     }
 }
