@@ -35,8 +35,11 @@ public class SearchController {
                                                  @RequestParam(required = false) String fileContent,
                                                   @RequestParam(required = false) Long minLikes,
                                                   @RequestParam(required = false) Long maxLikes,
+                                                  @RequestParam(required = false) String commentContent,
+                                                  @RequestParam(required = false) Long minComments,
+                                                  @RequestParam(required = false) Long maxComments,
                                                   @RequestParam(required = false, defaultValue = "OR") String operator) {
-        return postSearchService.searchPosts(title, content, operator, fileContent, minLikes, maxLikes);
+        return postSearchService.searchPosts(title, content, operator, fileContent, minLikes, maxLikes, commentContent, minComments, maxComments);
     }
 
 }

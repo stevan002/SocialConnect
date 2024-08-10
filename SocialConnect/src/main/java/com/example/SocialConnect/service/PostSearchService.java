@@ -24,8 +24,8 @@ public class PostSearchService {
 
     private final ElasticsearchOperations elasticsearchRestTemplate;
 
-    public List<Map<String, Object>> searchPosts(String title, String fullContent, String operator, String fileContent, Long minLikes, Long maxLikes) {
-        if (title == null && fullContent == null && fileContent == null && minLikes == null && maxLikes == null) {
+    public List<Map<String, Object>> searchPosts(String title, String fullContent, String operator, String fileContent, Long minLikes, Long maxLikes, String commentContent, Long minComments, Long maxComments) {
+        if (title == null && fullContent == null && fileContent == null && minLikes == null && maxLikes == null && commentContent == null && minComments == null && maxComments == null) {
             return Collections.emptyList();
         }
 
@@ -33,11 +33,12 @@ public class PostSearchService {
         List<HighlightField> fields = Arrays.asList(
                 new HighlightField("title"),
                 new HighlightField("full_content"),
-                new HighlightField("file_content")
+                new HighlightField("file_content"),
+                new HighlightField("comment_content")
         );
         HighlightQuery highlightQuery = new HighlightQuery(new Highlight(fields), PostIndex.class);
 
-        Query boolQuery = buildBoolQuery(title, fullContent, fileContent, operator, minLikes, maxLikes);
+        Query boolQuery = buildBoolQuery(title, fullContent, fileContent, operator, minLikes, maxLikes, commentContent, minComments, maxComments);
 
         NativeQuery searchQuery = new NativeQueryBuilder()
                 .withQuery(boolQuery)
@@ -58,14 +59,16 @@ public class PostSearchService {
         return results;
     }
 
-    private Query buildBoolQuery(String title, String fullContent, String fileContent, String operator, Long minNumberOfPosts, Long maxNumberOfPosts) {
+    private Query buildBoolQuery(String title, String fullContent, String fileContent, String operator, Long minNumberOfPosts, Long maxNumberOfPosts, String commentContent, Long minComments, Long maxComments) {
         return Query.of(q -> q.bool(b -> {
             boolean useAnd = "AND".equalsIgnoreCase(operator);
 
             addMatchQueries(b, "title", title, useAnd);
             addMatchQueries(b, "full_content", fullContent, useAnd);
             addMatchQueries(b, "file_content", fileContent, useAnd);
-            addRangeQuery(b, minNumberOfPosts, maxNumberOfPosts, useAnd);
+            addMatchQueries(b, "comment_content", commentContent, useAnd);
+            addRangeQuery(b, minNumberOfPosts, maxNumberOfPosts, useAnd, "number_of_likes");
+            addRangeQuery(b, minComments, maxComments, useAnd, "number_of_comments");
 
             return b;
         }));
@@ -86,15 +89,15 @@ public class PostSearchService {
         }
     }
 
-    private void addRangeQuery(BoolQuery.Builder b, Long minNumberOfLikes, Long maxNumberOfLikes, boolean useAnd) {
-        if (minNumberOfLikes != null && maxNumberOfLikes != null) {
-            String min = minNumberOfLikes.toString();
-            String max = maxNumberOfLikes.toString();
+    private void addRangeQuery(BoolQuery.Builder b, Long minValue, Long maxValue, boolean useAnd, String field) {
+        if (minValue != null && maxValue != null) {
+            String min = minValue.toString();
+            String max = maxValue.toString();
 
             if (useAnd) {
-                b.must(sb -> sb.range(r -> r.field("number_of_likes").from(min).to(max)));
+                b.must(sb -> sb.range(r -> r.field(field).from(min).to(max)));
             } else {
-                b.should(sb -> sb.range(r -> r.field("number_of_likes").from(min).to(max)));
+                b.should(sb -> sb.range(r -> r.field(field).from(min).to(max)));
             }
         }
     }
