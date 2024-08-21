@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface ReactionRepository extends JpaRepository<Reaction, Long> {
     Reaction findByPostAndCreatedBy(Post post, User user);
     Reaction findByCommentAndCreatedBy(Comment comment, User user);
+    void deleteAllByPostId(Long postId);
+    void deleteAllByCommentId(Long commentId);
 }

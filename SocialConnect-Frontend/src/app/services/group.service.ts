@@ -14,8 +14,8 @@ export class GroupService {
 
   constructor(private http: HttpClient) { }
 
-  createGroup(groupRequest: CreateGroupRequest): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.baseUrl}/create-group`, groupRequest);
+  createGroup(formData: FormData): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}/create-group`, formData);
   }
 
   getAllGroups(): Observable<GroupResponse[]> {

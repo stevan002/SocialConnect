@@ -13,9 +13,7 @@ import com.example.SocialConnect.mapper.PostMapper;
 import com.example.SocialConnect.model.Group;
 import com.example.SocialConnect.model.Post;
 import com.example.SocialConnect.model.User;
-import com.example.SocialConnect.repository.GroupRepository;
-import com.example.SocialConnect.repository.PostRepository;
-import com.example.SocialConnect.repository.UserRepository;
+import com.example.SocialConnect.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -38,6 +36,8 @@ public class PostService {
     private final FileServiceMinio fileService;
     private final PostIndexRepository postIndexRepository;
     private final GroupIndexRepository groupIndexRepository;
+    private final CommentRepository commentRepository;
+    private final ReactionRepository reactionRepository;
 
     public void createPost(CreatePostRequest post, String username, MultipartFile file) {
         User user = userRepository.findByUsername(username)
@@ -112,6 +112,10 @@ public class PostService {
         if (!post.getPostedBy().equals(user)) {
             throw new BadRequestException("group", "Not access to delete group for logged user");
         }
+
+        postIndexRepository.deleteByDatabaseId(post.getId());
+        commentRepository.deleteAllByPostId(post.getId());
+        reactionRepository.deleteAllByPostId(post.getId());
         postRepository.delete(post);
     }
 

@@ -18,6 +18,9 @@ import { PostCreateComponent } from './components/post/post-create/post-create.c
 import { CommentCreateComponent } from './components/comment/comment-create/comment-create.component';
 import { CommentListComponent } from './components/comment/comment-list/comment-list.component';
 import { ReactionCreateComponent } from './components/reaction/reaction-create/reaction-create.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { PostSearchComponent } from './components/post/post-search/post-search.component';
+import { GroupSearchComponent } from './components/group/group-search/group-search.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +34,10 @@ import { ReactionCreateComponent } from './components/reaction/reaction-create/r
     PostCreateComponent,
     CommentCreateComponent,
     CommentListComponent,
-    ReactionCreateComponent
+    ReactionCreateComponent,
+    NavbarComponent,
+    PostSearchComponent,
+    GroupSearchComponent
   ],
   imports: [
     BrowserModule,

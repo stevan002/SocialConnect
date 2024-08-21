@@ -13,9 +13,9 @@ export class PostService {
 
   constructor(private http: HttpClient) { }
 
-  createPost(postRequest: CreatePostRequest): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.baseUrl}/create-post`, postRequest);
-  }
+  createPost(formData: FormData): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}/create-post`, formData);
+  }  
 
   getPosts(): Observable<PostResponse[]> {
     return this.http.get<PostResponse[]>(this.baseUrl);

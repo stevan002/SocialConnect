@@ -1,0 +1,11 @@
+<nav>
+    <ul>
+        <li *ngIf="isLogged()"><a routerLink="/home">Home</a></li>
+        <li *ngIf="isLogged()"><a routerLink="/groups">Groups</a></li>
+        <li *ngIf="isLogged()"><a routerLink="/search-groups">Search Groups</a></li>
+        <li *ngIf="isLogged()"><a routerLink="/search-posts">Search Posts</a></li>
+        <li *ngIf="isLogged()"><a (click)="logout()">Log Out</a></li>
+        <li *ngIf="!isLogged()"><a routerLink="/login">Login</a></li>
+        <li *ngIf="!isLogged()"><a routerLink="/register">Registration</a></li>
+    </ul>
+</nav>

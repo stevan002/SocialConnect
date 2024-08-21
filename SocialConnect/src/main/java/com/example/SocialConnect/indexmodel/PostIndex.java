@@ -6,6 +6,8 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.persistence.Id;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,7 +36,7 @@ public class PostIndex {
     private Long numberOfComments;
 
     @Field(type = FieldType.Text, store = true, name = "comment_content", analyzer = "serbian", searchAnalyzer = "serbian")
-    private String commentContent;
+    private List<String> commentContent = new ArrayList<>();
 
     @Field(type = FieldType.Long, store = true, name = "database_id")
     private Long databaseId;

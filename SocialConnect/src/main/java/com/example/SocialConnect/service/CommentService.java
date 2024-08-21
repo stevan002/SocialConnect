@@ -13,6 +13,7 @@ import com.example.SocialConnect.model.Post;
 import com.example.SocialConnect.model.User;
 import com.example.SocialConnect.repository.CommentRepository;
 import com.example.SocialConnect.repository.PostRepository;
+import com.example.SocialConnect.repository.ReactionRepository;
 import com.example.SocialConnect.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostIndexRepository postIndexRepository;
+    private final ReactionRepository reactionRepository;
 
     public void createComment(CreateCommentRequest commentDto, String username) {
 
@@ -51,15 +53,7 @@ public class CommentService {
         PostIndex postIndex = postIndexRepository.findByDatabaseId(post.getId())
                 .orElseThrow(() -> new BadRequestException("postIndex", "Post index not found with given databaseId"));
 
-        String commentContent;
-        if(postIndex.getCommentContent() == null){
-            commentContent = "";
-        } else {
-            commentContent = postIndex.getCommentContent();
-        }
-
-        commentContent += comment.getText() + '\n';
-        postIndex.setCommentContent(commentContent);
+        postIndex.getCommentContent().add(comment.getText());
         postIndex.setNumberOfComments(postIndex.getNumberOfComments() + 1);
         postIndexRepository.save(postIndex);
     }
@@ -86,7 +80,14 @@ public class CommentService {
         if (!comment.getCreatedBy().equals(user)) {
             throw new BadRequestException("comment", "Not access to delete comment for logged user");
         }
-
+        String deletedContent = comment.getText();
+        postIndexRepository.findByDatabaseId(comment.getPost().getId())
+                .ifPresent(postIndex -> {
+                    postIndex.setNumberOfComments(postIndex.getNumberOfComments() - 1);
+                    postIndex.getCommentContent().remove(deletedContent);
+                    postIndexRepository.save(postIndex);
+                });
+        reactionRepository.deleteAllByCommentId(comment.getId());
         commentRepository.delete(comment);
     }
 }

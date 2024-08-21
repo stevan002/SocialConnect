@@ -1,17 +1,23 @@
 <div class="create-post-container">
     <h2>Create New Post</h2>
+    <input type="text" name="title" [(ngModel)]="title" placeholder="Enter title for post">
     <textarea [(ngModel)]="content" placeholder="What's on your mind?"></textarea>
+    
+    <input type="file" (change)="onFileSelected($event)" />
+  
     <div class="groups-selection">
-        <div class="group-option">
-            <label>
-                <input type="radio" name="group" [value]="null" [(ngModel)]="groupId"> No Group
-            </label>
-        </div>
-        <div *ngFor="let group of groups" class="group-option">
-            <label>
-                <input type="radio" name="group" [value]="group.id" [(ngModel)]="groupId"> {{ group.name }}
-            </label>
-        </div>
+      <div class="group-option">
+        <label>
+          <input type="radio" name="group" [value]="null" [(ngModel)]="groupId"> No Group
+        </label>
+      </div>
+      <div *ngFor="let group of groups" class="group-option">
+        <label>
+          <input type="radio" name="group" [value]="group.id" [(ngModel)]="groupId"> {{ group.name }}
+        </label>
+      </div>
     </div>
+  
     <button (click)="createPost()" class="create-button">Create Post</button>
-</div>
+  </div>
+  

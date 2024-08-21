@@ -2,6 +2,7 @@ import { CommentResponse } from "./CommentResponse";
 
 export interface PostResponse {
   id: number;
+  title: string;
   content: string;
   username: string;
   groupName: string;

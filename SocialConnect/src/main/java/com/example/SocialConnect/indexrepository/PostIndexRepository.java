@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface PostIndexRepository extends ElasticsearchRepository<PostIndex, String> {
     Optional<PostIndex> findByDatabaseId(Long id);
+    void deleteByDatabaseId(Long id);
 }

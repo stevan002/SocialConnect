@@ -1,0 +1,59 @@
+<div class="search-form">
+    <h2>Pretraga postova</h2>
+    <form (ngSubmit)="onSearch()">
+        <label for="title">Naslov:</label>
+        <input id="title" [(ngModel)]="searchParams.title" name="title" />
+
+        <label for="content">Sadržaj:</label>
+        <input id="content" [(ngModel)]="searchParams.content" name="content" />
+
+        <label for="fileContent">Sadržaj datoteke:</label>
+        <input id="fileContent" [(ngModel)]="searchParams.fileContent" name="fileContent" />
+
+        <label for="minLikes">Minimalan broj lajkova:</label>
+        <input type="number" id="minLikes" [(ngModel)]="searchParams.minLikes" name="minLikes" />
+
+        <label for="maxLikes">Maksimalan broj lajkova:</label>
+        <input type="number" id="maxLikes" [(ngModel)]="searchParams.maxLikes" name="maxLikes" />
+
+        <label for="commentContent">Sadržaj komentara:</label>
+        <input id="commentContent" [(ngModel)]="searchParams.commentContent" name="commentContent" />
+
+        <label for="minComments">Minimalan broj komentara:</label>
+        <input type="number" id="minComments" [(ngModel)]="searchParams.minComments" name="minComments" />
+
+        <label for="maxComments">Maksimalan broj komentara:</label>
+        <input type="number" id="maxComments" [(ngModel)]="searchParams.maxComments" name="maxComments" />
+
+        <label for="operator">Operator:</label>
+        <select id="operator" [(ngModel)]="searchParams.operator" name="operator">
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+        </select>
+
+        <button type="submit">Pretraga</button>
+    </form>
+</div>
+
+<div *ngIf="searchResults.length > 0" class="results">
+    <h2>Rezultati pretrage</h2>
+    <ul>
+        <li *ngFor="let result of searchResults" class="result-item">
+            <h3>{{ result.source.title }}</h3>
+            <p><strong>Sadržaj:</strong> {{ result.source.fullContent }}</p>
+            <p><strong>Sadržaj datoteke:</strong> {{ result.source.fileContent }}</p>
+            <p><strong>Broj lajkova:</strong> {{ result.source.numberOfLikes }}</p>
+            <p><strong>Broj komentara:</strong> {{ result.source.numberOfComments }}</p>
+            <p><strong>Sadržaj komentara:</strong> {{ result.source.commentContent }}</p>
+
+            <div *ngIf="result.highlights">
+                <h4>Istaknuti delovi:</h4>
+                <div *ngFor="let key of objectKeys(result.highlights)">
+                    <div *ngFor="let highlight of result.highlights[key]">
+                        <p><strong>{{ key }}:</strong> <span [innerHTML]="highlight"></span></p>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
