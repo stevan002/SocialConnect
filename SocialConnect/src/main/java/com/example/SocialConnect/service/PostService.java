@@ -3,6 +3,7 @@ package com.example.SocialConnect.service;
 import com.example.SocialConnect.dto.group.GroupResponse;
 import com.example.SocialConnect.dto.post.CreatePostRequest;
 import com.example.SocialConnect.dto.post.PostResponse;
+import com.example.SocialConnect.dto.post.UpdatePostRequest;
 import com.example.SocialConnect.exception.BadRequestException;
 import com.example.SocialConnect.indexmodel.GroupIndex;
 import com.example.SocialConnect.indexmodel.PostIndex;
@@ -131,5 +132,26 @@ public class PostService {
         }
 
         return documentContent;
+    }
+
+    public void updatePost(Long postId, String username, UpdatePostRequest request) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BadRequestException("post", "Not found post with given id"));
+
+        if(!post.getPostedBy().getUsername().equals(username)) {
+            throw new BadRequestException("post", "Not access to update post");
+        }
+
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
+        postRepository.save(post);
+
+        PostIndex index = postIndexRepository.findByDatabaseId(post.getId())
+                .orElseThrow(() -> new BadRequestException("post", "Not found post index with given database id"));
+
+        index.setTitle(request.getTitle());
+        index.setFullContent(request.getContent());
+        postIndexRepository.save(index);
     }
 }

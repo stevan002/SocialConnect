@@ -1,6 +1,7 @@
 package com.example.SocialConnect.controller;
 
 import com.example.SocialConnect.dto.comment.CreateCommentRequest;
+import com.example.SocialConnect.dto.comment.UpdateCommentRequest;
 import com.example.SocialConnect.dto.http.ApiResponse;
 import com.example.SocialConnect.service.CommentService;
 import jakarta.validation.Valid;
@@ -45,5 +46,12 @@ public class CommentController {
         String username = principal.getName();
         commentService.deleteComment(commentId, username);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Comment deleted successfully"));
+    }
+
+    @PutMapping("/update-comment/{commentId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentRequest request, Principal principal){
+        String username = principal.getName();
+        commentService.updateComment(commentId, request, username);
     }
 }

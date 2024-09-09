@@ -2,6 +2,7 @@ package com.example.SocialConnect.service;
 
 import com.example.SocialConnect.dto.comment.CommentResponse;
 import com.example.SocialConnect.dto.comment.CreateCommentRequest;
+import com.example.SocialConnect.dto.comment.UpdateCommentRequest;
 import com.example.SocialConnect.exception.BadRequestException;
 import com.example.SocialConnect.indexmodel.PostIndex;
 import com.example.SocialConnect.indexrepository.PostIndexRepository;
@@ -89,5 +90,34 @@ public class CommentService {
                 });
         reactionRepository.deleteAllByCommentId(comment.getId());
         commentRepository.delete(comment);
+    }
+
+    public void updateComment(Long commentId, UpdateCommentRequest request, String username) {
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BadRequestException("comment", "Comment not found with given id"));
+
+        if (!comment.getCreatedBy().getUsername().equals(username)) {
+            throw new BadRequestException("comment", "Not access to update comment for logged user");
+        }
+
+        PostIndex index = postIndexRepository.findByDatabaseId(comment.getId())
+                .orElseThrow(() -> new BadRequestException("postIndex", "Post index not found with given databaseId"));
+
+        List<String> commentContent = index.getCommentContent();
+        boolean isUpdated = false;
+
+        // Prolazimo kroz listu i ažuriramo samo prvu pojavu koja odgovara starom tekstu
+        for (int i = 0; i < commentContent.size(); i++) {
+            if (commentContent.get(i).equals(comment.getText()) && !isUpdated) {
+                commentContent.set(i, request.getText());
+                isUpdated = true; // Ažuriramo samo prvu pojavu
+            }
+        }
+
+        comment.setText(request.getText());
+        postIndexRepository.save(index);
+        commentRepository.save(comment);
+
     }
 }

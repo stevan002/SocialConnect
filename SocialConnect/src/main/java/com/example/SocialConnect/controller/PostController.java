@@ -2,6 +2,7 @@ package com.example.SocialConnect.controller;
 
 import com.example.SocialConnect.dto.http.ApiResponse;
 import com.example.SocialConnect.dto.post.CreatePostRequest;
+import com.example.SocialConnect.dto.post.UpdatePostRequest;
 import com.example.SocialConnect.service.FileServiceMinio;
 import com.example.SocialConnect.service.PostService;
 import jakarta.validation.Valid;
@@ -65,5 +66,13 @@ public class PostController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, minioResponse.headers().get("Content-Disposition"))
                 .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(Path.of(filename)))
                 .body(new InputStreamResource(minioResponse));
+    }
+
+    @PutMapping("/update/{postId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request, Principal principal){
+        String username = principal.getName();
+        postService.updatePost(postId, username, request);
+        return ResponseEntity.ok(new ApiResponse(true, "Successfully updated post"));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.SocialConnect.controller;
 
 import com.example.SocialConnect.dto.group.CreateGroupRequest;
+import com.example.SocialConnect.dto.group.UpdateGroupRequest;
 import com.example.SocialConnect.dto.http.ApiResponse;
 import com.example.SocialConnect.service.FileServiceMinio;
 import com.example.SocialConnect.service.GroupService;
@@ -68,5 +69,13 @@ public class GroupController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, minioResponse.headers().get("Content-Disposition"))
                 .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(Path.of(filename)))
                 .body(new InputStreamResource(minioResponse));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/update-group/{groupId}")
+    public ResponseEntity<?> updateGroup(@PathVariable Long groupId, @RequestBody UpdateGroupRequest request, Principal principal) {
+        String username = principal.getName();
+        groupService.updateGroup(groupId, request, username);
+        return ResponseEntity.ok(new ApiResponse(true, "Successfully updated group"));
     }
 }

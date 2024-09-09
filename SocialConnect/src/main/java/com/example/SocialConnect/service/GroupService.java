@@ -2,6 +2,7 @@ package com.example.SocialConnect.service;
 
 import com.example.SocialConnect.dto.group.CreateGroupRequest;
 import com.example.SocialConnect.dto.group.GroupResponse;
+import com.example.SocialConnect.dto.group.UpdateGroupRequest;
 import com.example.SocialConnect.exception.BadRequestException;
 import com.example.SocialConnect.indexmodel.GroupIndex;
 import com.example.SocialConnect.indexrepository.GroupIndexRepository;
@@ -56,7 +57,6 @@ public class GroupService {
                 .description(groupRequest.getDescription())
                 .fileContent(extractDocumentContent(file))
                 .numberOfPosts(0L)
-                .averageLikes(0.0)
                 .databaseId(group.getId())
                 .build();
 
@@ -102,5 +102,25 @@ public class GroupService {
         }
 
         return documentContent;
+    }
+
+    public void updateGroup(Long groupId, UpdateGroupRequest request, String username) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new BadRequestException("group", "Not found group with given id"));
+
+        if(!group.getCreatedBy().getUsername().equals(username)) {
+            throw new BadRequestException("group", "Not access to update group for logged user");
+        }
+
+        GroupIndex index = groupIndexRepository.findByDatabaseId(group.getId())
+                .orElseThrow(() -> new BadRequestException("group", "Not found group index"));
+
+        group.setName(request.getName());
+        group.setDescription(request.getDescription());
+        groupRepository.save(group);
+
+        index.setName(request.getName());
+        index.setDescription(request.getDescription());
+        groupIndexRepository.save(index);
     }
 }
