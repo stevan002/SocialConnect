@@ -11,8 +11,14 @@
                     <strong>Loves:</strong> {{ comment.loveCount }}
                     <strong>Dislikes:</strong> {{ comment.dislikeCount }}
                 </p>
-                <app-reaction-create [commentId]="comment.id" (reactionCreated)="onReactionCreated()"></app-reaction-create>
-                <button *ngIf="canDeleteComment(comment)" (click)="deleteComment(comment.id)" class="delete-comment-button">Delete</button>
+                <app-reaction-create [commentId]="comment.id"
+                    (reactionCreated)="onReactionCreated()"></app-reaction-create>
+                <div class="button-container">
+                    <button *ngIf="canDeleteComment(comment)" (click)="deleteComment(comment.id)"
+                        class="delete-comment-button">Delete</button>
+                    <button *ngIf="canDeleteComment(comment)" (click)="goToUpdatePage(comment.id)"
+                        class="update-comment-button">Update</button>
+                </div>
             </div>
         </li>
     </ul>

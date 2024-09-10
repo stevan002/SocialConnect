@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../model/ApiResponse';
 import { CreateGroupRequest } from '../model/CreateGroupRequest';
 import { GroupResponse } from '../model/GroupResponse';
+import { UpdateGroupRequest } from '../model/UpdateGroupRequest';
 
 @Injectable({
   providedIn: 'root'
@@ -28,5 +29,9 @@ export class GroupService {
 
   deleteGroup(groupId: number): Observable<ApiResponse> {
     return this.http.delete<ApiResponse>(`${this.baseUrl}/delete-group/${groupId}`);
+  }
+
+  updateGroup(groupId: number, updateRequest: UpdateGroupRequest): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(`${this.baseUrl}/update-group/${groupId}`, updateRequest);
   }
 }

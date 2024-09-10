@@ -101,23 +101,26 @@ public class CommentService {
             throw new BadRequestException("comment", "Not access to update comment for logged user");
         }
 
-        PostIndex index = postIndexRepository.findByDatabaseId(comment.getId())
+        PostIndex index = postIndexRepository.findByDatabaseId(comment.getPost().getId())
                 .orElseThrow(() -> new BadRequestException("postIndex", "Post index not found with given databaseId"));
 
         List<String> commentContent = index.getCommentContent();
         boolean isUpdated = false;
 
-        // Prolazimo kroz listu i ažuriramo samo prvu pojavu koja odgovara starom tekstu
         for (int i = 0; i < commentContent.size(); i++) {
             if (commentContent.get(i).equals(comment.getText()) && !isUpdated) {
                 commentContent.set(i, request.getText());
-                isUpdated = true; // Ažuriramo samo prvu pojavu
+                isUpdated = true;
+                break; // Prekida petlju nakon ažuriranja prve pojave
             }
         }
 
         comment.setText(request.getText());
+
+        index.setCommentContent(commentContent);
+
         postIndexRepository.save(index);
         commentRepository.save(comment);
-
     }
+
 }

@@ -4,6 +4,7 @@ import { PostService } from '../../../services/post.service';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../../../services/user-service.service';
 import { CommentService } from '../../../services/comment.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-post-list',
@@ -15,7 +16,7 @@ export class PostListComponent implements OnInit{
   posts: PostResponse[] = [];
   currentUsername: string | null = null;
 
-  constructor(private postService: PostService, private commentService: CommentService, private userService: UserService, private toastr: ToastrService){}
+  constructor(private postService: PostService, private commentService: CommentService, private userService: UserService, private toastr: ToastrService, private router: Router){}
 
   ngOnInit(): void {
     this.loadPosts();
@@ -70,7 +71,11 @@ export class PostListComponent implements OnInit{
     this.loadPosts();
   }
 
-  canDeletePost(post: PostResponse): boolean {
+  hideButton(post: PostResponse): boolean {
     return this.currentUsername === post.username;
+  }
+
+  goToUpdatePage(postId: number): void {
+    this.router.navigate([`/posts/update/${postId}`]);
   }
 }

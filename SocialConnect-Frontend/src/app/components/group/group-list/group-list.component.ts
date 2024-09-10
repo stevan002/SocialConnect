@@ -51,7 +51,11 @@ export class GroupListComponent implements OnInit {
     }
   }
 
-  canDeleteGroup(group: GroupResponse): boolean {
+  hideButton(group: GroupResponse): boolean {
     return this.currentUsername === group.username;
+  }
+
+  goToUpdatePage(groupId: number): void {
+    this.router.navigate([`/groups/update/${groupId}`]);
   }
 }

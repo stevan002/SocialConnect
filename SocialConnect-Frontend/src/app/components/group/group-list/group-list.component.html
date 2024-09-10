@@ -8,7 +8,8 @@
           <p>{{ group.description }}</p>
           <span class="creation-date">Created by {{ group.username }} on {{ group.creationDate | date }} </span>
         </div>
-        <button *ngIf="canDeleteGroup(group)" (click)="deleteGroup(group.id)" class="delete-button">Delete</button>
+        <button *ngIf="hideButton(group)" (click)="deleteGroup(group.id)" class="delete-button">Delete</button>
+        <button *ngIf="hideButton(group)" (click)="goToUpdatePage(group.id)" class="update-button">Update Group</button>
       </li>
     </ul>
   </div>

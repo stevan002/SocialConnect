@@ -1,0 +1,15 @@
+<div class="update-comment-container">
+    <h2>Update Comment</h2>
+    <form (ngSubmit)="updateComment()" #updateCommentForm="ngForm">
+        <div class="form-group">
+            <label for="text">Comment Text</label>
+            <textarea id="text" class="form-control" [(ngModel)]="updateRequest.text" name="text" required
+                #text="ngModel"></textarea>
+            <div *ngIf="text.invalid && (text.dirty || text.touched)" class="alert alert-danger">
+                Comment text is required.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="updateCommentForm.invalid">Update Comment</button>
+    </form>
+</div>

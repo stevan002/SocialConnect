@@ -1,0 +1,21 @@
+<form (ngSubmit)="updateGroup()" #updateGroupForm="ngForm">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" class="form-control" [(ngModel)]="updateRequest.name" name="name" required
+            #name="ngModel" />
+        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+            Name is required.
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" class="form-control" [(ngModel)]="updateRequest.description" name="description"
+            required #description="ngModel"></textarea>
+        <div *ngIf="description.invalid && (description.dirty || description.touched)" class="alert alert-danger">
+            Description is required.
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="updateGroupForm.invalid">Update Group</button>
+</form>

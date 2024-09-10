@@ -53,5 +53,6 @@ public class CommentController {
     public ResponseEntity<?> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentRequest request, Principal principal){
         String username = principal.getName();
         commentService.updateComment(commentId, request, username);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponse(true, "Comment updated successfully"));
     }
 }

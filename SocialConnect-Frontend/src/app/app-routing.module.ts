@@ -10,6 +10,9 @@ import { PostListComponent } from './components/post/post-list/post-list.compone
 import { PostCreateComponent } from './components/post/post-create/post-create.component';
 import { GroupSearchComponent } from './components/group/group-search/group-search.component';
 import { PostSearchComponent } from './components/post/post-search/post-search.component';
+import { PostUpdateComponent } from './components/post/post-update/post-update.component';
+import { GroupUpdateComponent } from './components/group/group-update/group-update.component';
+import { CommentUpdateComponent } from './components/comment/comment-update/comment-update.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -21,6 +24,9 @@ const routes: Routes = [
   { path: 'create-post', component: PostCreateComponent, canActivate: [AuthGuard]},
   { path: 'search-groups', component: GroupSearchComponent, canActivate: [AuthGuard]},
   { path: 'search-posts', component: PostSearchComponent, canActivate: [AuthGuard]},
+  { path: 'posts/update/:id', component: PostUpdateComponent },
+  { path: 'groups/update/:id', component: GroupUpdateComponent },
+  { path: 'comments/update/:id', component: CommentUpdateComponent},
   { path: '**', redirectTo: 'posts' } 
 ];;
 

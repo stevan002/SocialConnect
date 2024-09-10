@@ -21,6 +21,9 @@ import { ReactionCreateComponent } from './components/reaction/reaction-create/r
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { PostSearchComponent } from './components/post/post-search/post-search.component';
 import { GroupSearchComponent } from './components/group/group-search/group-search.component';
+import { PostUpdateComponent } from './components/post/post-update/post-update.component';
+import { GroupUpdateComponent } from './components/group/group-update/group-update.component';
+import { CommentUpdateComponent } from './components/comment/comment-update/comment-update.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +40,10 @@ import { GroupSearchComponent } from './components/group/group-search/group-sear
     ReactionCreateComponent,
     NavbarComponent,
     PostSearchComponent,
-    GroupSearchComponent
+    GroupSearchComponent,
+    PostUpdateComponent,
+    GroupUpdateComponent,
+    CommentUpdateComponent
   ],
   imports: [
     BrowserModule,

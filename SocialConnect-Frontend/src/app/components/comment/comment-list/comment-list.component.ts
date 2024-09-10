@@ -3,13 +3,14 @@ import { CommentResponse } from '../../../model/CommentResponse';
 import { UserService } from '../../../services/user-service.service';
 import { CommentService } from '../../../services/comment.service';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-comment-list',
   templateUrl: './comment-list.component.html',
   styleUrls: ['./comment-list.component.css']
 })
-export class CommentListComponent implements OnInit{
+export class CommentListComponent implements OnInit {
   currentUsername: string | null = null;
   @Input() comments: CommentResponse[] = [];
   @Input() postId?: number;
@@ -17,9 +18,9 @@ export class CommentListComponent implements OnInit{
   constructor(
     private userService: UserService,
     private commentService: CommentService,
-    private toastr: ToastrService
-  ){}
-
+    private toastr: ToastrService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.currentUsername = this.userService.getUsernameFromToken();
@@ -60,5 +61,9 @@ export class CommentListComponent implements OnInit{
         }
       });
     }
+  }
+
+  goToUpdatePage(commentId: number): void {
+    this.router.navigate([`comments/update/${commentId}`]);
   }
 }
